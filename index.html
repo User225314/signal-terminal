@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090d13">
+<title>Signal Terminal — Archive 08</title>
+<style>
+:root{color-scheme:dark;--bg:#090d13;--panel:#111b22;--line:#29413d;--text:#ddf4e7;--dim:#8ca99c;--green:#92efb5;--amber:#f5c776}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 78% 15%,#16302e 0,transparent 32%),radial-gradient(circle at 10% 90%,#1e222b 0,transparent 38%),var(--bg);font:16px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--text)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#0002 4px);opacity:.25}
+a{color:var(--green)}
+button,input{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1050px;margin:0 auto;padding:30px 22px 65px;position:relative}
+.top{display:flex;justify-content:space-between;gap:15px;align-items:center;color:var(--dim);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 15px var(--green);margin-right:9px;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-size:clamp(2.3rem,7vw,5.4rem);line-height:1.02;letter-spacing:-.08em;margin:58px 0 14px;text-transform:uppercase}
+h1 span{color:var(--green)}
+.intro{color:var(--dim);max-width:630px;margin:0 0 30px}
+.layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:16px}
+.panel{background:linear-gradient(135deg,#121e24ef,#10171def);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 40px #0005;overflow:hidden}
+.cap{border-bottom:1px solid var(--line);padding:12px 18px;color:var(--dim);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px}
+.screen{min-height:290px;padding:22px;white-space:pre-wrap;overflow-wrap:anywhere;color:#bce7cb;text-shadow:0 0 10px #7dffbc30}
+.screen .accent{color:var(--amber)}
+.controls{padding:18px;border-top:1px solid var(--line)}
+label{display:block;color:var(--dim);font-size:.8rem;margin-bottom:9px;text-transform:uppercase;letter-spacing:.12em}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+input{width:130px;min-height:46px;padding:9px 12px;border:1px solid #40645a;border-radius:8px;background:#091117;color:var(--green);outline:none}
+input:focus,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button{border:1px solid #4e8d6c;background:#193b30;color:var(--text);border-radius:8px;padding:10px 15px;min-height:46px}
+button:hover{background:#275641}
+button:disabled{cursor:not-allowed;opacity:.42}
+button.ghost{background:transparent;border-color:#3a4c4a}
+button.ghost:hover{background:#263633}
+aside{padding:20px}
+h2{font-size:1rem;letter-spacing:.12em;text-transform:uppercase;margin:3px 0 14px}
+.step{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line);color:var(--dim)}
+.step strong{color:var(--green)}
+.step.done{color:var(--text)}
+.step .num{font-size:.8rem;border:1px solid #426959;border-radius:50%;width:26px;height:26px;flex:none;text-align:center;line-height:24px}
+.hint{font-size:.85rem;color:var(--dim);margin:20px 0}
+.small{color:var(--dim);font-size:.78rem}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);margin-top:24px;padding-top:17px;color:var(--dim);font-size:.76rem}
+footer nav{display:flex;gap:18px;flex-wrap:wrap}
+.reveal{margin-top:16px;padding:18px;border:1px solid #bd9461;background:#372a1d;border-radius:11px;color:#ffe1aa}
+.reveal[hidden]{display:none}
+@media(max-width:720px){.layout{grid-template-columns:1fr}h1{margin-top:40px}.screen{min-height:245px}}
+@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="top"><span><i class="dot" aria-hidden="true"></i>Archive connection active</span><span>Case 225314 / 08</span></div>
+<h1>Signal <span>Terminal</span></h1>
+<p class="intro">The hallway archive ended at frame 0004. A receiver kept recording. Tune the missing channel, decode the message, and decide where the camera should turn.</p>
+<div class="layout">
+<section class="panel" aria-label="Signal receiver">
+<div class="cap"><span>Receiver / channel <span id="channel-label">—</span></span><span id="state-label">waiting</span></div>
+<div id="screen" class="screen" role="status" aria-live="polite">> SYSTEM READY
+> Seven doors visible.
+> One channel absent from the index.
+
+Enter a channel number from 01 to 08 and press TUNE.</div>
+<div class="controls">
+<label for="channel">Channel frequency</label>
+<div class="row">
+<input id="channel" inputmode="numeric" maxlength="2" placeholder="01–08" aria-label="Channel number">
+<button id="tune">Tune frequency</button>
+<button id="decode" disabled>Decode signal</button>
+</div>
+<div class="row" style="margin-top:10px">
+<button id="look" disabled>Turn camera around</button>
+<button id="reset" class="ghost">Reset case</button>
+</div>
+<div id="ending" class="reveal" hidden><strong>FRAME 0005 RECOVERED</strong><br>The camera turns toward the wall behind it. A rectangular outline appears around the lens. The eighth door was never at the end of the hallway.<br><br>Case status: OPEN. The signal did not come from outside.</div>
+</div>
+</section>
+<aside class="panel">
+<h2>Investigation</h2>
+<div class="step" id="step1"><span class="num">1</span><span><strong>Find the channel.</strong><br>Seven doors. Eight records.</span></div>
+<div class="step" id="step2"><span class="num">2</span><span><strong>Decode the signal.</strong><br>Numbers can be letters.</span></div>
+<div class="step" id="step3"><span class="num">3</span><span><strong>Turn around.</strong><br>The last frame is missing.</span></div>
+<p class="hint" id="hint">Hint: the original archive says there are seven doors, but eight records.</p>
+<p class="small">This browser stores your progress on this device only. No visitor count or account data is collected by this page.</p>
+</aside>
+</div>
+<footer><span>A fictional GitHub mystery. No real person, place, or emergency is depicted.</span><nav><a href="https://github.com/User225314/door-is-open">Original archive</a><a href="https://github.com/User225314/the-eighth-door">Missing frames</a><a href="https://github.com/User225314/operator-unknown">Operator log</a><a href="https://github.com/User225314/signal-terminal">Source code</a></nav></footer>
+</main>
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const payload = "20 48 45 20 44 4F 4F 52 20 49 53 20 42 45 48 49 4E 44 20 59 4F 55";
+const key = "signal-terminal-progress-v1";
+let stage = 0;
+try { stage = Math.min(3, Math.max(0, Number(localStorage.getItem(key)) || 0)); } catch (_) {}
+const save = () => { try { localStorage.setItem(key, String(stage)); } catch (_) {} };
+function render() {
+ $("channel-label").textContent = stage ? "08" : "—";
+ $("state-label").textContent = ["waiting","locked","decoded","open"][stage];
+ $("decode").disabled = stage < 1;
+ $("look").disabled = stage < 2;
+ $("ending").hidden = stage < 3;
+ for (let i = 1; i <= 3; i++) $("step"+i).classList.toggle("done", stage >= i);
+ if (stage === 0) $("screen").textContent = "> SYSTEM READY\n> Seven doors visible.\n> One channel absent from the index.\n\nEnter a channel number from 01 to 08 and press TUNE.";
+ if (stage === 1) $("screen").textContent = "> CHANNEL 08 / SIGNAL DETECTED\n> SOURCE: UNLISTED\n> PAYLOAD: " + payload + "\n\nThe bytes are hexadecimal. Press DECODE SIGNAL.";
+ if (stage >= 2) $("screen").textContent = "> CHANNEL 08 / DECODE COMPLETE\n> MESSAGE: THE DOOR IS BEHIND YOU\n\n" + (stage === 3 ? "> CAMERA ROTATED / FRAME 0005 RECOVERED" : "Press TURN CAMERA AROUND.");
+ $("hint").textContent = stage ? (stage === 1 ? "Hint: each pair is one hexadecimal character. The decoder is also in the operator-unknown repo." : "The signal refers to the camera, not you.") : "Hint: the original archive says there are seven doors, but eight records.";
+}
+$("tune").addEventListener("click", () => {
+ const value = $("channel").value.trim();
+ if (!/^(0?[1-8])$/.test(value)) { $("screen").textContent = "> INVALID CHANNEL\n> Enter a number from 01 to 08."; return; }
+ if (Number(value) !== 8) { $("screen").textContent = "> CHANNEL " + value.padStart(2,"0") + " / STATIC\n> No signal. The index has seven doors, but eight records."; return; }
+ stage = Math.max(stage, 1); save(); render();
+});
+$("channel").addEventListener("keydown", e => { if (e.key === "Enter") $("tune").click(); });
+$("decode").addEventListener("click", () => { stage = Math.max(stage, 2); save(); render(); });
+$("look").addEventListener("click", () => { stage = 3; save(); render(); });
+$("reset").addEventListener("click", () => { stage = 0; $("channel").value = ""; save(); render(); });
+render();
+})();
+</script>
+</body>
+</html>
